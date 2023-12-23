@@ -3,8 +3,11 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SubCategoryController;
+use App\Http\Controllers\UserInfoController;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +21,9 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
+// update user profile
+Route::post('/update_user/{id}',[UserInfoController::class, 'update'])->name('update_user_data');
+// auth routes
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/register', [RegisterController::class, 'register']);
 // category
@@ -36,6 +41,11 @@ Route::get('/fetchSliders', [SliderController::class, 'index']);
 Route::post('/addSlider', [SliderController::class, 'store']);
 Route::put('/updateSlider/{id}', [SliderController::class, 'update']);
 Route::delete('/deleteSlider/{id}', [SliderController::class, 'delete']);
+
+// Product
+Route::post('/addProduct', [ProductController::class, 'store'])->name('addProduct');
+Route::get('/products/category/{categoryId}', [ProductController::class, 'getByCategory']);
+Route::get('/products/subcategory/{subcategoryId}', [ProductController::class, 'getBySubcategory']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
