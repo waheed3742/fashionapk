@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddToCartController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoryController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\UserInfoController;
+use App\Http\Controllers\WishListController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -46,6 +48,17 @@ Route::delete('/deleteSlider/{id}', [SliderController::class, 'delete']);
 Route::post('/addProduct', [ProductController::class, 'store'])->name('addProduct');
 Route::get('/products/category/{categoryId}', [ProductController::class, 'getByCategory']);
 Route::get('/products/subcategory/{subcategoryId}', [ProductController::class, 'getBySubcategory']);
+
+
+// Wishlist routes
+    Route::post('/wishlist/add/{product}', [WishListController::class, 'addToWishlist']);
+    Route::delete('/wishlist/remove/{product}', [WishlistController::class, 'removeFromWishlist']);
+    Route::get('/wishlist', [WishlistController::class, 'allWishList']);
+// addtocart routes
+    Route::post('/addtocart/add/{product}', [AddToCartController::class, 'addToCart']);
+    Route::post('/updatecart/update/{product}', [AddToCartController::class, 'updateCart']);
+    Route::delete('/deletecart/remove/{product}', [AddToCartController::class, 'removeFromCart']);
+    Route::get('/allcartitem', [AddToCartController::class, 'allCartItem']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
