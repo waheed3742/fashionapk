@@ -4,18 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
     public function index()
     {
+        if (Auth::check()) {
         try {
+            print_r('ok');exit;
             $category = Category::all();
             return response()->json($category, 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Something went wrong'], 500);
         }
+    }
+    return response()->json(['error' => 'Unauthorized'], 401);
     }
 
     public function store(Request $request)

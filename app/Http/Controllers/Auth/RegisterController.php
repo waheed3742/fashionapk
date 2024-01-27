@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Passport\RefreshToken;
+use Laravel\Passport\Token;
 
 class RegisterController extends Controller
 {
@@ -32,5 +34,21 @@ class RegisterController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Something went wrong'], 500);
         }
+    }
+    public function logout()
+    {
+        if (Auth::check()) {
+            // If authenticated, delete the user's tokens
+            Auth::user()->tokens()->delete();
+            return response()->json([
+                'message' => 'Successfully logged out',
+            ]);
+        }
+        else {
+            return response()->json([
+                'message' => 'No user found',
+            ]);
+        }
+
     }
 }

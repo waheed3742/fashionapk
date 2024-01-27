@@ -11,16 +11,20 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         try {
+            // print_r($request->userAgent());exit;
             $credentials = $request->only('email', 'password');
             $remember = $request->has('remember');
             if (Auth::attempt($credentials,$remember)) {
                 $user = Auth::user();
-                $token = $user->createToken('authToken')->accessToken;
-                return response()->json(['token' => $token, 'user' => $user], 200);
+                $user['token'] = $user->createToken('Laravelia')->accessToken;
+                return response()->json(['user' => $user], 200);
             }
             return response()->json(['error' => 'Invalid credentials'], 401);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Something went wrong'], 500);
+            return response()->json(['error' => 'Something went wrong','e'=>$e->getMessage()], 500);
         }
+    }
+    public function showLoginForm() {
+        return response()->json(['success' => 'authenticated.'], 200);
     }
 }

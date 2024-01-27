@@ -4,11 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\Variation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
+    public function getAllProducts()
+    {
+        try {
+            $product = Product::with(['variations', 'images'])->get();
+
+            if (!$product) {
+                return response()->json(['error' => 'Products not found'], 404);
+            }
+            return response()->json(['products'=>$product], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error fetching products', 'message' => $e->getMessage()], 500);
+        }
+    }
     public function store(Request $request)
     {
         try {
@@ -34,6 +48,20 @@ class ProductController extends Controller
                 'quantity' => $request->input('quantity', 0),
                 'availability' => $request->input('availability', true),
             ]);
+            $size = $request->input('size');
+            $colors = $request->input('colors');
+            $stock = $request->input('stock');
+            $variation_price = $request->input('variation_price');
+
+            foreach ($colors as $key => $color) {
+                $variation = new Variation();
+                $variation->size = $size;
+                $variation->color = $color;
+                $variation->stock = $stock[$key];
+                $variation->variation_price = $variation_price[$key];
+
+                $product->variations()->save($variation);
+            }
             if ($images = $request->file('images')) {
                 foreach ($images as $image) {
                     $destinationPath = 'productimages/';
@@ -53,6 +81,24 @@ class ProductController extends Controller
         }
     }
 
+    public function getProductDetails($id)
+    {
+        try {
+            $product = Product::with(['variations', 'images'])->find($id);
+
+            if (!$product) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
+            $variationsBySize = $product->variations->groupBy('size');
+        $responseData = [
+            'product' => $product->toArray(),
+            'variations_by_size' => $variationsBySize->toArray(),
+        ];
+            return response()->json($responseData, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error fetching product details', 'message' => $e->getMessage()], 500);
+        }
+    }
     public function getByCategory($categoryId)
     {
         try {
